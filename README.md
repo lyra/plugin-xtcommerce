@@ -14,4 +14,4 @@ Coming soon.
 
 Each PayZen payment plugin source file included in this distribution is licensed under the MIT license.
 
-Please see LICENSE.txt for the full text of the MIT license. It is also available through the world-wide-web at this URL: https://opensource.org/licenses/mit-license.html.
+Please see LICENSE for the full text of the MIT license. It is also available through the world-wide-web at this URL: https://opensource.org/licenses/mit-license.html.
