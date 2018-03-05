@@ -1,29 +1,31 @@
 <!-- 
- * PayZen V2-Payment Module version 1.0 (revision 65291) for xtCommerce 4.1.x.
- *
- * Copyright (C) 2014 Lyra Network and contributors
- * Support contact : support@payzen.eu
- * Author link : http://www.lyra-network.com/
+ * PayZen V2-Payment Module version 1.0.1 for xtCommerce 4.1.x. Support contact : support@payzen.eu.
  *
  * The MIT License (MIT)
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
  * @category  payment
  * @package   payzen
- * @author    Lyra Network <supportvad@lyra-network.com>
- * @copyright 2014 Lyra Network and contributors
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @version   1.0 (revision 65291)
+ * @author    Lyra Network (http://www.lyra-network.com/)
+ * @copyright 2014-2016 Lyra Network and contributors
+ * @license   http://www.opensource.org/licenses/mit-license.html  The MIT License (MIT)
 -->
 
 {assign var="payment_icon" value=$payment_icon|default:"cards.png,cards_multi.png"}
@@ -38,9 +40,9 @@
 		<span style="display: inline-block; width: 25px;">{form type=radio name=selected_payment value=$payment_code:std}</span>
 		{$payment_name} {$smarty.session.payzen_std_title} {if $payment_price.formated}<span class="normal">({$payment_price.formated})</span>{/if}
 		<span class="float-right"><img src="plugins/ly_payzen/images/{$std_payment_icon|default:'cards.png'}"/></span>
-    </p>
-    
-    <p class="payment-desc" style="padding-left: 25px;">{$payment_desc}</p>
+	</p>
+
+	<p class="payment-desc" style="padding-left: 25px;">{$payment_desc}</p>
 </div><!-- .box .box-white .box-hover -->
 {/if}
 
@@ -50,30 +52,30 @@
 		<span style="display: inline-block; width: 25px;">{form type=radio name=selected_payment value=$payment_code:multi}</span>
 		{$payment_name} {$smarty.session.payzen_multi_title} {if $payment_price.formated}<span class="normal">({$payment_price.formated})</span>{/if}
 		<span class="float-right"><img src="plugins/ly_payzen/images/{$multi_payment_icon|default:'cards_multi.png'}"/></span>
-    </p>
-    
-    <div>
-    {if $smarty.session.payzen_multi_options|@count == 1}
+	</p>
+
+	<div>
+	{if $smarty.session.payzen_multi_options|@count == 1}
 		{foreach from=$smarty.session.payzen_multi_options item="option"}
 			<input type="hidden" id="payzen_multi_opt_{$option.id}" name="payzen_multi_opt" value="{$option.id}" />
-		   	<label for="payzen_multi_opt_{$option.id}" style="margin-left: 25px;">{$option.label}</label>
-		   	<br />
-		{/foreach}	 
+			<label for="payzen_multi_opt_{$option.id}" style="margin-left: 25px;">{$option.label}</label>
+			<br />
+		{/foreach}
 	{else}
 		{assign var=first value=true}
 		{foreach from=$smarty.session.payzen_multi_options item="option"}
 			<input type="radio" id="payzen_multi_opt_{$option.id}" name="payzen_multi_opt" value="{$option.id}" style="margin-left: 25px; vertical-align: middle;" {if $first == true}checked="checked"{/if} />
 			<label for="payzen_multi_opt_{$option.id}">{$option.label}</label>
 			<br />
-			
+
 			{if $first == true}
 				{assign var=first value=false}
-		    {/if}
-	   	{/foreach}
+			{/if}
+		{/foreach}
 	{/if}
-    </div>
-    <br />
-    <p class="payment-desc" style="padding-left: 25px;">{$payment_desc}</p>
+	</div>
+	<br />
+	<p class="payment-desc" style="padding-left: 25px;">{$payment_desc}</p>
 </div><!-- .box .box-white .box-hover -->
 
 {literal}

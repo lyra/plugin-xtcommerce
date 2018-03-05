@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xtcommerceplugin>
 	<title>PayZen</title>
-	<version>1.0</version>
+	<version>1.0.1</version>
 	<code>ly_payzen</code>
 	<url>http://www.lyra-network.com</url>
 	<description>Secured payments by card bank with PayZen</description>
 	<icon>payzen.png</icon>
 	<type>payment</type>
-	
+
 	<payment>
 		<payment_code>ly_payzen</payment_code>
 		<payment_dir>ly_payzen</payment_dir>
@@ -26,7 +26,7 @@
 			<description>Sichere Kartenzahlung mit PayZen</description>
 		</de>
 	</payment>
-	
+
 	<db_install><![CDATA[
 		$db->Execute("INSERT INTO ".TABLE_PAYMENT_COST." (`payment_id`, `payment_geo_zone`, `payment_country_code`, `payment_type_value_from`, `payment_type_value_to`, `payment_price`,`payment_allowed`) VALUES(".$payment_id.", 24, '', 0, 10000.00, 0, 1);");
 		$db->Execute("INSERT INTO ".TABLE_PAYMENT_COST." (`payment_id`, `payment_geo_zone`, `payment_country_code`, `payment_type_value_from`, `payment_type_value_to`, `payment_price`,`payment_allowed`) VALUES(".$payment_id.", 25, '', 0, 10000.00, 0, 1);");
@@ -36,7 +36,7 @@
 		$db->Execute("INSERT INTO ".TABLE_PAYMENT_COST." (`payment_id`, `payment_geo_zone`, `payment_country_code`, `payment_type_value_from`, `payment_type_value_to`, `payment_price`,`payment_allowed`) VALUES(".$payment_id.", 29, '', 0, 10000.00, 0, 1);");
 		$db->Execute("INSERT INTO ".TABLE_PAYMENT_COST." (`payment_id`, `payment_geo_zone`, `payment_country_code`, `payment_type_value_from`, `payment_type_value_to`, `payment_price`,`payment_allowed`) VALUES(".$payment_id.", 30, '', 0, 10000.00, 0, 1);");
 		$db->Execute("INSERT INTO ".TABLE_PAYMENT_COST." (`payment_id`, `payment_geo_zone`, `payment_country_code`, `payment_type_value_from`, `payment_type_value_to`, `payment_price`,`payment_allowed`) VALUES(".$payment_id.", 31, '', 0, 10000.00, 0, 1);");
-		
+
 		$db->Execute("UPDATE ".TABLE_CONFIGURATION_PAYMENT." SET `group_id` = 4, `sort_order` = 47 WHERE `config_key` = 'LY_PAYZEN_ORDER_STATUS_NEW'");
 	]]>
 	</db_install>
@@ -51,8 +51,8 @@
 			<order>1</order>
 			<active>1</active>
 		</code>
-		
-        <code>
+
+		<code>
 			<hook>admin_dropdown.php:dropdown</hook>
 			<phpcode><![CDATA[
 				include _SRV_WEBROOT . _SRV_WEB_PLUGINS . 'ly_payzen/hooks/admin_dropdown.php_dropdown.php';
@@ -60,35 +60,35 @@
 			<order>1</order>
 			<active>1</active>
 		</code>
-        
-        <code>
-	        <hook>adminHandler.php:_bottom</hook>
-	        <phpcode><![CDATA[
+
+		<code>
+			<hook>adminHandler.php:_bottom</hook>
+			<phpcode><![CDATA[
 				include _SRV_WEBROOT . _SRV_WEB_PLUGINS . 'ly_payzen/hooks/adminHandler.php__bottom.php';
 			]]></phpcode>
-	        <order>1</order>
-	        <active>1</active>
+			<order>1</order>
+			<active>1</active>
 		</code>
-		
+
 		<code>
-	        <hook>class.payment.php:_get_bottom</hook>
-	        <phpcode><![CDATA[
+			<hook>class.payment.php:_get_bottom</hook>
+			<phpcode><![CDATA[
 				include _SRV_WEBROOT . _SRV_WEB_PLUGINS . 'ly_payzen/hooks/class.payment.php__get_bottom.php';
 			]]></phpcode>
-	        <order>1</order>
-	        <active>1</active>
+			<order>1</order>
+			<active>1</active>
 		</code>
-		
+
 		<code>
-	        <hook>module_checkout.php:checkout_payment_bottom</hook>
-	        <phpcode><![CDATA[
+			<hook>module_checkout.php:checkout_payment_bottom</hook>
+			<phpcode><![CDATA[
 				include _SRV_WEBROOT . _SRV_WEB_PLUGINS . 'ly_payzen/hooks/module_checkout.php_checkout_payment_bottom.php';
 			]]></phpcode>
-	        <order>1</order>
-	        <active>1</active>
+			<order>1</order>
+			<active>1</active>
 		</code>
 	</plugin_code> 
-	
+
 	<configuration_payment>
 		<config>
 			<key>MODULE_INFORMATION</key>
@@ -105,7 +105,7 @@
 				<title>MODULINFORMATIONEN</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>DEVELOPED_BY</key>
 			<value>Lyra Network</value>
@@ -122,7 +122,7 @@
 				<title>Entwickelt von</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>CONTACT_EMAIL</key>
 			<value>support@payzen.eu</value>
@@ -139,10 +139,10 @@
 				<title>Kontakt</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>MODULE_VERSION</key>
-			<value>1.0</value>
+			<value>1.0.1</value>
 			<type>payzen_label</type>
 			<sort_order>3</sort_order>
 			<group_id>0</group_id>
@@ -156,7 +156,7 @@
 				<title>Modulversion</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>GATEWAY_VERSION</key>
 			<value>V2</value>
@@ -173,7 +173,7 @@
 				<title>Plattformversion</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>TESTED_WITH</key>
 			<value>xt Commerce 4.1.x</value>
@@ -190,7 +190,7 @@
 				<title>Getestet mit</title>
 			</de>
 		</config>
-	
+
 		<config>
 			<key>PAYMENT_GATEWAY_ACCESS</key>
 			<type>payzen_section_title</type>
@@ -206,7 +206,7 @@
 				<title>ZUGANG ZAHLUNGSSCHNITTSTELLE</title>
 			</de>
 		</config>
-	
+
 		<config>
 			<key>SITE_ID</key>
 			<value>12345678</value>
@@ -223,7 +223,7 @@
 				<title>Site ID</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>KEY_TEST</key>
 			<value>1111111111111111</value>
@@ -240,7 +240,7 @@
 				<title>Zertifikat im Testbetrieb</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>KEY_PROD</key>
 			<value>2222222222222222</value>
@@ -257,7 +257,7 @@
 				<title>Zertifikat im Produktivbetrieb</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>CTX_MODE</key>
 			<value>TEST</value>
@@ -275,7 +275,7 @@
 				<title>Modus</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>PLATFORM_URL</key>
 			<value>https://secure.payzen.eu/vads-payment/</value>
@@ -292,7 +292,7 @@
 				<title>Plattform-URL</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>CHECK_URL</key>
 			<value></value>
@@ -309,7 +309,7 @@
 				<title>Server-URL</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>PAYMENT_PAGE</key>
 			<type>payzen_section_title</type>
@@ -325,7 +325,7 @@
 				<title>ZAHLUNGSSEITE</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>DEFAULT_LANGUAGE</key>
 			<value>fr</value>
@@ -343,7 +343,7 @@
 				<title>Standardsprache</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>AVAILABLE_LANGUAGES</key>
 			<value></value>
@@ -361,6 +361,7 @@
 				<title>Verfügbare Sprachen</title>
 			</de>
 		</config>
+
 		<config>
 			<key>CAPTURE_DELAY</key>
 			<value></value>
@@ -377,7 +378,7 @@
 				<title>Einzugsfrist</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>VALIDATION_MODE</key>
 			<value></value>
@@ -395,7 +396,7 @@
 				<title>Bestätigungsmodus</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>PAYMENT_CARDS</key>
 			<value></value>
@@ -413,7 +414,7 @@
 				<title>Verfügbare karten</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>SELECTIVE_3DS</key>
 			<type>payzen_section_title</type>
@@ -429,7 +430,7 @@
 				<title>SELEKTIVES 3DS</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>3DS_MIN_AMOUNT</key>
 			<value></value>
@@ -446,7 +447,7 @@
 				<title>Mindestbetrag zur Aktivierung von 3DS</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>RETURN_TO_SHOP</key>
 			<type>payzen_section_title</type>
@@ -462,7 +463,7 @@
 				<title>ZURÜCK ZUM SHOP</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>REDIRECT_ENABLED</key>
 			<value>False</value>
@@ -480,7 +481,7 @@
 				<title>Automatische Weiterleitung</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>REDIRECT_SUCCESS_TIMEOUT</key>
 			<value>5</value>
@@ -497,7 +498,7 @@
 				<title>Zeitbeschränkung Weiterleitung im Erfolgsfall</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>REDIRECT_SUCCESS_MESSAGE</key>
 			<value>Redirection vers la boutique dans quelques instants...</value>
@@ -514,8 +515,8 @@
 				<title>Weiterleitungs-Nachricht im Erfolgsfall</title>
 			</de>
 		</config>
-		
-	 	<config>
+
+		<config>
 			<key>REDIRECT_ERROR_TIMEOUT</key>
 			<value>5</value>
 			<type>textfield</type>
@@ -531,7 +532,7 @@
 				<title>Zeitbeschränkung Weiterleitung nach Ablehnung</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>REDIRECT_ERROR_MESSAGE</key>
 			<value>Redirection vers la boutique dans quelques instants...</value>
@@ -548,7 +549,7 @@
 				<title>Weiterleitungs-Nachricht nach Ablehnung</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>RETURN_MODE</key>
 			<value>GET</value>
@@ -566,7 +567,7 @@
 				<title>Übermittlungs-Modus</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>SUCCESS_ORDER_STATUS</key>
 			<value>23</value>
@@ -584,7 +585,7 @@
 				<title>Bestellstatus bei gelungener Zahlung</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>FAILED_ORDER_STATUS</key>
 			<value>32</value>
@@ -602,7 +603,7 @@
 				<title>Bestellstatus bei gescheiterter Zahlung</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>STD_PAYMENT</key>
 			<type>payzen_section_title</type>
@@ -618,7 +619,7 @@
 				<title>STANDARD ZAHLUNG</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>STD_ENABLED</key>
 			<value>true</value>
@@ -635,7 +636,7 @@
 				<title>Aktivierung der Standard Zahlung</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>STD_TITLE</key>
 			<value>Standard Zahlung</value>
@@ -652,7 +653,7 @@
 				<title>Titel Standard Zahlung</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>STD_MIN_AMOUNT</key>
 			<value></value>
@@ -669,7 +670,7 @@
 				<title>Mindestbetrag</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>STD_MAX_AMOUNT</key>
 			<value></value>
@@ -686,7 +687,7 @@
 				<title>Höchstbetrag</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>MULTI_PAYMENT</key>
 			<type>payzen_section_title</type>
@@ -702,7 +703,7 @@
 				<title>RATENZAHLUNG</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>MULTI_ENABLED</key>
 			<value>false</value>
@@ -719,7 +720,7 @@
 				<title>Aktivierung Ratenzahlung</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>MULTI_TITLE</key>
 			<value>Ratenzahlung</value>
@@ -736,7 +737,7 @@
 				<title>Titel Ratenzahlung</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>MULTI_MIN_AMOUNT</key>
 			<value></value>
@@ -753,7 +754,7 @@
 				<title>Mindestbetrag</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>MULTI_MAX_AMOUNT</key>
 			<value></value>
@@ -770,7 +771,7 @@
 				<title>Höchstbetrag</title>
 			</de>
 		</config>
-		
+
 		<config>
 			<key>MULTI_OPTIONS</key>
 			<value></value>
@@ -788,351 +789,351 @@
 			</de>
 		</config>
 	</configuration_payment>
-	
+
 	<language_content>
 		<phrase>
-	    	<key>TEXT_PAYZEN_DEFAULT</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_DEFAULT</key>
+			<class>admin</class>
+			<fr>
 				<value>Configuration back-office</value>
 			</fr>
 			<en>
 				<value>Back-office configuration</value>
 			</en>
-	    	<de>
+			<de>
 				<value>Einstellungen des Backoffice</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_AUTOMATIC</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_AUTOMATIC</key>
+			<class>admin</class>
+			<fr>
 				<value>Automatique</value>
 			</fr>
 			<en>
 				<value>Automatic</value>
 			</en>
-	    	<de>
+			<de>
 				<value>Auto</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_MANUAL</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_MANUAL</key>
+			<class>admin</class>
+			<fr>
 				<value>Manuel</value>
 			</fr>
 			<en>
 				<value>Manual</value>
 			</en>
-	    	<de>
+			<de>
 				<value>Manuell</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_ENABLED</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_ENABLED</key>
+			<class>admin</class>
+			<fr>
 				<value>Activé</value>
 			</fr>
 			<en>
 				<value>Enabled</value>
 			</en>
-	    	<de>
+			<de>
 				<value>Aktiviert</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_DISABLED</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_DISABLED</key>
+			<class>admin</class>
+			<fr>
 				<value>Désactivé</value>
 			</fr>
 			<en>
 				<value>Disabled</value>
 			</en>
-	    	<de>
+			<de>
 				<value>Deaktiviert</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_FRENCH</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_FRENCH</key>
+			<class>admin</class>
+			<fr>
 				<value>Français</value>
 			</fr>
 			<en>
 				<value>French</value>
 			</en>
-	    	<de>
+			<de>
 				<value>Französisch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_ENGLISH</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_ENGLISH</key>
+			<class>admin</class>
+			<fr>
 				<value>Anglais</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>English</value>
 			</en>
 			<de>
 				<value>Englisch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_GERMAN</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_GERMAN</key>
+			<class>admin</class>
+			<fr>
 				<value>Allemand</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>German</value>
 			</en>
 			<de>
 				<value>Deutsch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_SPANISH</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_SPANISH</key>
+			<class>admin</class>
+			<fr>
 				<value>Espagnol</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Spanish</value>
 			</en>
 			<de>
 				<value>Spanisch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_ITALIAN</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_ITALIAN</key>
+			<class>admin</class>
+			<fr>
 				<value>Italien</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Italian</value>
 			</en>
 			<de>
 				<value>Italienisch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_PORTUGUESE</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_PORTUGUESE</key>
+			<class>admin</class>
+			<fr>
 				<value>Portugais</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Portuguese</value>
 			</en>
 			<de>
 				<value>Portugiesisch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_DUTCH</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_DUTCH</key>
+			<class>admin</class>
+			<fr>
 				<value>Néerlandais</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Dutch</value>
 			</en>
 			<de>
 				<value>Niederländisch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_SWEDISH</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_SWEDISH</key>
+			<class>admin</class>
+			<fr>
 				<value>Suédois</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Swedish</value>
 			</en>
 			<de>
 				<value>Schwedisch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_JAPANESE</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_JAPANESE</key>
+			<class>admin</class>
+			<fr>
 				<value>Japonais</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Japanese</value>
 			</en>
 			<de>
 				<value>Japanisch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_CHINESE</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_CHINESE</key>
+			<class>admin</class>
+			<fr>
 				<value>Chinois</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Chinese</value>
 			</en>
 			<de>
 				<value>Chinesisch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_RUSSIAN</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_RUSSIAN</key>
+			<class>admin</class>
+			<fr>
 				<value>Russe</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Russian</value>
 			</en>
 			<de>
 				<value>Russisch</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_LABEL</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_LABEL</key>
+			<class>admin</class>
+			<fr>
 				<value>Libellé</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Label</value>
 			</en>
 			<de>
 				<value>Kennzeichnung</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_MIN_AMOUNT</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_MIN_AMOUNT</key>
+			<class>admin</class>
+			<fr>
 				<value>Montant min</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Amount min</value>
 			</en>
 			<de>
 				<value>Mindestbetrag</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_MAX_AMOUNT</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_MAX_AMOUNT</key>
+			<class>admin</class>
+			<fr>
 				<value>Montant max</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Max amount</value>
 			</en>
 			<de>
 				<value>Höchstbetrag</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_CONTRACT</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_CONTRACT</key>
+			<class>admin</class>
+			<fr>
 				<value>Contrat</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Contract</value>
 			</en>
 			<de>
 				<value>Vertrag</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_COUNT</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_COUNT</key>
+			<class>admin</class>
+			<fr>
 				<value>Nombre</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Count</value>
 			</en>
 			<de>
 				<value>Nummer</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_PERIOD</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_PERIOD</key>
+			<class>admin</class>
+			<fr>
 				<value>Période</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Period</value>
 			</en>
 			<de>
 				<value>Zeitraum</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_FIRST</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_FIRST</key>
+			<class>admin</class>
+			<fr>
 				<value>1er Paiement</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>1st payment</value>
 			</en>
 			<de>
 				<value>1. Zahlung</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_ADD</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_ADD</key>
+			<class>admin</class>
+			<fr>
 				<value>Ajouter</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Add</value>
 			</en>
 			<de>
 				<value>Hinzufügen</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_DELETE</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_DELETE</key>
+			<class>admin</class>
+			<fr>
 				<value>Supprimer</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Delete</value>
 			</en>
 			<de>
@@ -1140,140 +1141,140 @@
 			</de>
 		</phrase>
 		
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_MESSAGE</key>
-	    	<class>both</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_MESSAGE</key>
+			<class>both</class>
+			<fr>
 				<value>Message</value>
 			</fr>
 			<en>
 				<value>Message</value>
 			</en>
-	    	<de>
+			<de>
 				<value>Mitteilung</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_TRANSACTION_TYPE</key>
-	    	<class>both</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_TRANSACTION_TYPE</key>
+			<class>both</class>
+			<fr>
 				<value>Type de transaction</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Transaction type</value>
 			</en>
 			<de>
 				<value>Transaktionstyp</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_AMOUNT</key>
-	    	<class>both</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_AMOUNT</key>
+			<class>both</class>
+			<fr>
 				<value>Montant</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Amount</value>
 			</en>
 			<de>
 				<value>Betrag</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_TRANSACTION_ID</key>
-	    	<class>both</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_TRANSACTION_ID</key>
+			<class>both</class>
+			<fr>
 				<value>ID de transaction</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Transaction ID</value>
 			</en>
 			<de>
 				<value>Transaktions ID</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_TRANSACTION_STATUS</key>
-	    	<class>both</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_TRANSACTION_STATUS</key>
+			<class>both</class>
+			<fr>
 				<value>Statut de transaction</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Transaction status</value>
 			</en>
 			<de>
 				<value>Transaktionsstatus</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_PAYMENT_MEAN</key>
-	    	<class>both</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_PAYMENT_MEAN</key>
+			<class>both</class>
+			<fr>
 				<value>Moyen de paiement</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Method of payment</value>
 			</en>
 			<de>
 				<value>Zahlungsmethode</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_CARD_NUMBER</key>
-	    	<class>both</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_CARD_NUMBER</key>
+			<class>both</class>
+			<fr>
 				<value>Numéro de carte</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Card number</value>
 			</en>
 			<de>
 				<value>Kartennummer</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_EXPIRATION_DATE</key>
-	    	<class>both</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_EXPIRATION_DATE</key>
+			<class>both</class>
+			<fr>
 				<value>Date d'expiration</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Expiry date</value>
 			</en>
 			<de>
 				<value>Gültig bis</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_MULTI_OPTION</key>
-	    	<class>both</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_MULTI_OPTION</key>
+			<class>both</class>
+			<fr>
 				<value>Option de paiement</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Payment option</value>
 			</en>
 			<de>
 				<value>Zahlungsoptionen</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>BUTTON_START_PAYMENT</key>
-	    	<class>store</class>
-	    	<fr>
+			<key>BUTTON_START_PAYMENT</key>
+			<class>store</class>
+			<fr>
 				<value>Aller à PayZen</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Go to PayZen</value>
 			</en>
 			<de>
@@ -1282,12 +1283,12 @@
 		</phrase>
 
 		<phrase>
-	    	<key>TEXT_PAYMENT_STD</key>
-	    	<class>store</class>
-	    	<fr>
+			<key>TEXT_PAYMENT_STD</key>
+			<class>store</class>
+			<fr>
 				<value>Paiement standard</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Standard Payment</value>
 			</en>
 			<de>
@@ -1296,12 +1297,12 @@
 		</phrase>
 
 		<phrase>
-	    	<key>TEXT_PAYMENT_MULTI</key>
-	    	<class>store</class>
-	    	<fr>
+			<key>TEXT_PAYMENT_MULTI</key>
+			<class>store</class>
+			<fr>
 				<value>Paiement multiple</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Multi Payment</value>
 			</en>
 			<de>
@@ -1310,96 +1311,96 @@
 		</phrase>
 
 		<phrase>
-	    	<key>TEXT_PAYZEN_CHECK_URL_WARN</key>
-	    	<class>store</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_CHECK_URL_WARN</key>
+			<class>store</class>
+			<fr>
 				<value>La commande a été validée mais la confirmation automatique n'a pas fonctionné. Avez-vous correctement configuré l'URL serveur dans le back-office de votre boutique ?</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>The automatic notification (peer to peer connection between the payment platform and your shopping cart solution) hasn't worked. Have you correctly set up the server URL in your PayZen backoffice ?</value>
 			</en>
 			<de>
 				<value>Die automatische Benachrichtigung (peer to peer Verbindung zwischen der Zahlungsplattform und Ihres Zahlungsmodul) hat nicht funktioniert. Haben Sie die Server URL in Ihrem  PayZen Backoffice richtig eingestellt?</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_CHECK_URL_WARN_DETAIL</key>
-	    	<class>store</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_CHECK_URL_WARN_DETAIL</key>
+			<class>store</class>
+			<fr>
 				<value><![CDATA[Afin de comprendre la problématique, reportez vous à la documentation du module : <br />&nbsp;&nbsp;&nbsp;- Chapitre &laquo;A lire attentivement avant d'aller loin&raquo;<br />&nbsp;&nbsp;&nbsp;- Chapitre &laquo;Paramétrage de l'URL serveur&raquo;]]></value>
 			</fr>
-	    	<en>
+			<en>
 				<value><![CDATA[For understanding the problem, please read the documentation of the module : <br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;To read carefully before going further&raquo;<br />&nbsp;&nbsp;&nbsp;- Chapter &laquo;Server URL settings&raquo;]]></value>
 			</en>
 			<de>
 				<value><![CDATA[Um das Problem zu verstehen, lesen Sie bitte die Anleitung des Moduls: <br />&nbsp;&nbsp;&nbsp;- Kapitel &laquo;Aufmerksam lesen&raquo;<br />&nbsp;&nbsp;&nbsp;- Kapitel &laquo;Einstellungen Server URL&raquo;]]></value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_GOING_INTO_PROD_INFO</key>
-	    	<class>store</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_GOING_INTO_PROD_INFO</key>
+			<class>store</class>
+			<fr>
 				<value><![CDATA[<p><u>PASSAGE EN PRODUCTION</u></p>Vous souhaitez savoir comment passer votre boutique en production merci de consulter cette URL]]></value>
 			</fr>
-	    	<en>
+			<en>
 				<value><![CDATA[<p><u>GOING INTO PRODUCTION</u></p>You want to know how to put your shop into production mode, please go to this URL]]></value>
 			</en>
 			<de>
 				<value><![CDATA[<p><u>UMSTELLUNG AUF PRODUKTIONSMODUS</u></p>Wenn Sie wissen möchten, wie Sie Ihren Shop auf Produktionsmodus umstellen können, klicken Sie bitte auf diese URL]]></value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_PAYMENT_FAILURE</key>
-	    	<class>store</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_PAYMENT_FAILURE</key>
+			<class>store</class>
+			<fr>
 				<value>Votre commande n'a pas pu être confirmée. Le paiement n'a pas été accepté.</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Your order has not been confirmed. The payment has not been accepted.</value>
 			</en>
 			<de>
 				<value>Ihre Bestellung wurde bestätigt. Die Zahlung wurde nicht akzeptiert.</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_PAYMENT_ERROR</key>
-	    	<class>store</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_PAYMENT_ERROR</key>
+			<class>store</class>
+			<fr>
 				<value>Une erreur est survenue dans le processus de paiement.</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>An error occurred in the payment process.</value>
 			</en>
 			<de>
 				<value>Ein Fehler ist bei dem Zahlungsvorgang aufgetreten.</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_ALERT</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_ALERT</key>
+			<class>admin</class>
+			<fr>
 				<value>Alerte</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>Alert</value>
 			</en>
 			<de>
 				<value>Warnung</value>
 			</de>
 		</phrase>
-		
+
 		<phrase>
-	    	<key>TEXT_PAYZEN_INTERNAL_ERROR</key>
-	    	<class>admin</class>
-	    	<fr>
+			<key>TEXT_PAYZEN_INTERNAL_ERROR</key>
+			<class>admin</class>
+			<fr>
 				<value>Une erreur interne est survenue.</value>
 			</fr>
-	    	<en>
+			<en>
 				<value>An internal error occurred.</value>
 			</en>
 			<de>
