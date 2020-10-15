@@ -1,94 +1,114 @@
 <!-- 
- * PayZen V2-Payment Module version 1.0.1 for xtCommerce 4.1.x. Support contact : support@payzen.eu.
+/**
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for xt:Commerce. See COPYING.md for license details.
  *
- * The MIT License (MIT)
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
- * @category  payment
- * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://www.opensource.org/licenses/mit-license.html  The MIT License (MIT)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+ */
 -->
 
-{assign var="payment_icon" value=$payment_icon|default:"cards.png,cards_multi.png"}
-{assign var="pos" value=$payment_icon|strpos:","}
+{if $smarty.session.payzen_std_enabled || $smarty.session.payzen_multi_enabled}
 
-{assign var="std_payment_icon" value=$payment_icon|substr:0:$pos}
-{assign var="multi_payment_icon" value=$payment_icon|substr:$pos+1}
-
-{if $smarty.session.payzen_std_enabled}
-<div class="box box-white box-hover">
-	<p class="payment-name">
-		<span style="display: inline-block; width: 25px;">{form type=radio name=selected_payment value=$payment_code:std}</span>
-		{$payment_name} {$smarty.session.payzen_std_title} {if $payment_price.formated}<span class="normal">({$payment_price.formated})</span>{/if}
-		<span class="float-right"><img src="plugins/ly_payzen/images/{$std_payment_icon|default:'cards.png'}"/></span>
-	</p>
-
-	<p class="payment-desc" style="padding-left: 25px;">{$payment_desc}</p>
-</div><!-- .box .box-white .box-hover -->
-{/if}
-
-{if $smarty.session.payzen_multi_enabled}
-<div class="box box-white box-hover">
-	<p class="payment-name">
-		<span style="display: inline-block; width: 25px;">{form type=radio name=selected_payment value=$payment_code:multi}</span>
-		{$payment_name} {$smarty.session.payzen_multi_title} {if $payment_price.formated}<span class="normal">({$payment_price.formated})</span>{/if}
-		<span class="float-right"><img src="plugins/ly_payzen/images/{$multi_payment_icon|default:'cards_multi.png'}"/></span>
-	</p>
-
-	<div>
-	{if $smarty.session.payzen_multi_options|@count == 1}
-		{foreach from=$smarty.session.payzen_multi_options item="option"}
-			<input type="hidden" id="payzen_multi_opt_{$option.id}" name="payzen_multi_opt" value="{$option.id}" />
-			<label for="payzen_multi_opt_{$option.id}" style="margin-left: 25px;">{$option.label}</label>
-			<br />
-		{/foreach}
-	{else}
-		{assign var=first value=true}
-		{foreach from=$smarty.session.payzen_multi_options item="option"}
-			<input type="radio" id="payzen_multi_opt_{$option.id}" name="payzen_multi_opt" value="{$option.id}" style="margin-left: 25px; vertical-align: middle;" {if $first == true}checked="checked"{/if} />
-			<label for="payzen_multi_opt_{$option.id}">{$option.label}</label>
-			<br />
-
-			{if $first == true}
-				{assign var=first value=false}
-			{/if}
-		{/foreach}
-	{/if}
-	</div>
-	<br />
-	<p class="payment-desc" style="padding-left: 25px;">{$payment_desc}</p>
-</div><!-- .box .box-white .box-hover -->
-
+<style>
 {literal}
-	<script type="text/javascript">
-	<!--
-		// patch to avoid payment option click on payment mode selection
-		$('input[type=radio][name=payzen_multi_opt]').click(function(e) {
-			if(!e.originalEvent) {
-				e.preventDefault();
-				return false;
-			}
-		});
-	//-->
-	</script>
+    .payzen_sub_payment {
+        vertical-align: middle;
+        padding-left: 25px;
+    }
+
+    #checkout .list-group .list-group-item.active.list-group-item-ly_payzen {
+        background-color: inherit;
+        color: inherit;
+    }
 {/literal}
+</style>
+
+<script type="text/javascript">
+{literal}
+    function toggle(switchElement) {
+       if (switchElement.value === 'multi') {
+           $("#payzen_multi_options").show();
+       } else {
+           $("#payzen_multi_options").hide();
+       }
+    }
+{/literal}
+</script>
+<div class="item item-{$payment_code}{if $payment_code === $payment_selected} selected{/if} payment-container" style="overflow:hidden; height:1%;">
+    <img src="plugins/ly_payzen/images/cards.png" class="icon img-responsive pull-right"
+    	alt="PayZen"
+    	title="{$payment_name}" />
+    <header data-toggle="collapse" data-target=".item-{$payment_code} .collapse" style="margin-top:10px">
+        <label class="cursor-pointer">
+            <span class="check">
+            {if $payment_hidden == true}
+                {form type=hidden name=selected_payment value=$payment_code}
+            {else}
+                {if $isSelected}
+                    {form type=radio name=selected_payment value=$payment_code checked=checked style="vertical-align: text-top;"}
+                {else}
+                    {form type=radio name=selected_payment value=$payment_code style="vertical-align: text-top;"}
+                {/if}
+            {/if}
+            </span>
+
+            {if $smarty.session.payzen_std_enabled && $smarty.session.payzen_multi_enabled}
+                <span class="name payment-name">{$payment_name}</span>
+            {else} 
+                {if $smarty.session.payzen_std_enabled}
+                    <span class="name payment-name">{if $smarty.session.payzen_std_title}{$smarty.session.payzen_std_title}{/if}</span>
+                {else}
+                    <span class="name payment-name">{if $smarty.session.payzen_multi_title}{$smarty.session.payzen_multi_title}{/if}</span>
+                {/if}
+            {/if}
+            {if $payment_price.formated}
+                <small class="price">&nbsp;{$payment_price.formated}</small>
+            {/if}
+        </label>
+    </header>
+
+    <div class="desc {if $smarty.session.payzen_multi_enabled}collapse{if $payment_code === $payment_selected} in{/if}{/if}" {if ! $smarty.session.payzen_multi_enabled}style="display:none;"{/if}>
+        {assign var=checked value=true}
+        {if $smarty.session.payzen_std_enabled}
+            <label class="payzen_sub_payment">
+                <input type="radio" id="payzen_sub_std" name="payzen_selected_payment_sub" value="std" {if $checked === true} checked="checked"{/if} onClick="toggle(this)"/>
+            </label>
+            <label for="payzen_sub_std" class="name payment-name">{if $smarty.session.payzen_std_title}{$smarty.session.payzen_std_title}{/if}</label>
+            {assign var=checked value=false}
+        {/if}
+        <br />
+
+        {if $smarty.session.payzen_multi_enabled}
+            <label class="payzen_sub_payment" >
+                <input type="radio" id="payzen_sub_multi" name="payzen_selected_payment_sub" value="multi" {if $checked === true} checked="checked"{/if} onClick="toggle(this)" {if ! $smarty.session.payzen_std_enabled}style="display:none;"{/if}/>
+            </label>
+            <label for="payzen_sub_multi" class="name payment-name" {if ! $smarty.session.payzen_std_enabled}style="display:none;"{/if}>{if $smarty.session.payzen_multi_title}{$smarty.session.payzen_multi_title}{/if}</label>
+            <br />
+
+            <div id="payzen_multi_options" style="{if $smarty.session.payzen_std_enabled}display: none;{else}margin-top:-30px;{/if}padding-left: 25px;">
+                {if $smarty.session.payzen_multi_options|@count === 1}
+                    {foreach from=$smarty.session.payzen_multi_options item="option"}
+                        <input type="hidden" id="payzen_multi_opt_{$option.id}" name="payzen_multi_opt" value="{$option.id}" />
+                        <label for="payzen_multi_opt_{$option.id}" style="margin-left: 25px; color: inherit; font-size: 13px; font-weight:normal;">{$option.label}</label>
+                        <br />
+                    {/foreach}
+                {else}
+                    {assign var=first value=true}
+                    {foreach from=$smarty.session.payzen_multi_options item="option"}
+                        <input type="radio" id="payzen_multi_opt_{$option.id}" name="payzen_multi_opt" value="{$option.id}" style="margin-left: 25px; vertical-align: middle;" {if $first === true}checked="checked"{/if} />
+                        <label for="payzen_multi_opt_{$option.id}" style="color: inherit; font-size: 13px; font-weight:normal;">{$option.label}</label>
+                        <br />
+                        {if $first === true}
+                            {assign var=first value=false}
+                        {/if}
+                    {/foreach}
+                {/if}
+                <br />
+            </div>
+            <br />
+        {/if}
+    </div>
+</div>
 {/if}

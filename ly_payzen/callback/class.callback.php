@@ -1,225 +1,266 @@
 <?php
 /**
- * PayZen V2-Payment Module version 1.0.1 for xtCommerce 4.1.x. Support contact : support@payzen.eu.
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for xt:Commerce. See COPYING.md for license details.
  *
- * The MIT License (MIT)
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
- * @category  payment
- * @package   payzen
- * @author    Lyra Network (http://www.lyra-network.com/)
- * @copyright 2014-2016 Lyra Network and contributors
- * @license   http://www.opensource.org/licenses/mit-license.html  The MIT License (MIT)
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
  */
 
-defined ('_VALID_CALL') or die ('Direct Access is not allowed.');
+defined ('_VALID_CALL') or die('Direct Access is not allowed.');
+
+require_once _SRV_WEBROOT . _SRV_WEB_PLUGINS . 'ly_payzen/classes/class.PayzenResponse.php';
+require_once _SRV_WEBROOT . _SRV_WEB_PLUGINS . 'ly_payzen/classes/class.ly_payzen.php';
+require_once _SRV_WEBROOT . _SRV_WEB_PLUGINS . 'ly_payzen/classes/class.PayzenLogger.php';
 
 /**
  * Callback class to process return from payment platform.
  */
-require_once _SRV_WEBROOT . _SRV_WEB_PLUGINS . 'ly_payzen/classes/payzen_api.php';
-class callback_ly_payzen extends callback {
-	var $version = '1.0.1';
+class callback_ly_payzen extends callback
+{
+    var $version = '1.1.0';
 
-	private $from_server = false;
+    private $from_server;
+    private $multi_option;
+    private $logger;
+    private $payzenResponse;
 
-	function __construct() {
-		$this->from_server = key_exists('vads_hash', $_REQUEST) && isset($_REQUEST['vads_hash']);
+    function __construct()
+    {
+        $this->logger = PayzenLogger::getLogger(__CLASS__);
 
-		if($this->from_server) {
-			// reload initial session
-			preg_match('#^([^=]+)=([^=]+)#', $_REQUEST['vads_order_info'], $matches) ;
+        // Add request parameters decoding.
+        foreach ($_REQUEST as $name => $value) {
+            $_REQUEST[$name] = html_entity_decode($value, ENT_QUOTES);
+        }
 
-			session_write_close();
+        $this->from_server = isset($_REQUEST['vads_hash']) && ! empty($_REQUEST['vads_hash']);
 
-			session_name($matches[1]);
-			session_id($matches[2]);
-			session_start();
-		}
-	}
+        $this->payzenResponse = new PayzenResponse (
+            $_REQUEST,
+            LY_PAYZEN_CTX_MODE,
+            LY_PAYZEN_KEY_TEST,
+            LY_PAYZEN_KEY_PROD,
+            LY_PAYZEN_SIGN_ALGO // Add signature algorithm to response.
+        );
 
-	function process() {
-		global $xtLink, $info;
+        $session_name = $this->payzenResponse->getExtInfo('session_name');
+        $session_id = $this->payzenResponse->getExtInfo('session_id');
 
-		$payzenResponse = new PayzenResponse (
-				$_REQUEST,
-				LY_PAYZEN_CTX_MODE,
-				LY_PAYZEN_KEY_TEST,
-				LY_PAYZEN_KEY_PROD
-		);
+        $this->multi_option = $this->payzenResponse->getExtInfo('multi_option');
 
-		$this->orders_id = (int)$payzenResponse->get('order_id');
-		$this->customers_id = (int)$payzenResponse->get('cust_id');
+        if ($session_name && $session_id) {
+            // Reload initial session.
+            session_write_close();
 
-		// prepare callback log data
-		$log_data = array();
-		$log_data['module'] = 'ly_payzen';
-		$log_data['orders_id'] = $this->orders_id;
-		$log_data['transaction_id'] = $payzenResponse->get('trans_id');
+            session_name($session_name);
+            session_id($session_id);
+            session_start();
+        }
+    }
 
-		// check request authenticity
-		if (! $payzenResponse->isAuthentified()) {
-			$log_data['class'] = 'error';
-			$log_data['error_msg'] = 'Authentication error';
-			$log_data['error_data'] = serialize($payzenResponse->raw_response);
-			$this->_addLogEntry($log_data);
+    function _getValue($name, $array)
+    {
+        if (isset($array[$name])) {
+            return $array[$name];
+        }
 
-			if($this->from_server) {
-				die($payzenResponse->getOutputForGateway('auth_fail'));
-			} else {
-				$info->_addInfoSession(TEXT_PAYZEN_PAYMENT_ERROR, 'error');
-				$xtLink->_redirect($xtLink->_link(array ('page' => 'index')));
-			}
-		}
+        return null;
+    }
 
-		// load order data from DB
-		$order = new order($this->orders_id, $this->customers_id);
-		if(!is_array($order->order_data)) {
-			$log_data['class'] = 'error';
-			$log_data['error_msg'] = 'Order not found';
-			$log_data['error_data'] = serialize($payzenResponse->raw_response);
-			$this->_addLogEntry($log_data);
+    function process()
+    {
+        global $xtLink, $info;
 
-			if($this->from_server) {
-				die($payzenResponse->getOutputForGateway('order_not_found'));
-			} else {
-				$info->_addInfoSession(TEXT_PAYZEN_PAYMENT_ERROR, 'error');
-				$xtLink->_redirect($xtLink->_link(array ('page' => 'index')));
-			}
-		}
+        $this->orders_id = (int) $this->payzenResponse->get('order_id');
+        $this->customers_id = (int) $this->payzenResponse->get('cust_id');
 
-		if(!$this->from_server && LY_PAYZEN_CTX_MODE === 'TEST') {
-			$info->_addInfoSession(TEXT_PAYZEN_GOING_INTO_PROD_INFO . ': <a href="https://secure.payzen.eu/html/faq/prod" target="_blank">https://secure.payzen.eu/html/faq/prod</a>', 'info');
-		}
+        // Check request authenticity.
+        if (! $this->payzenResponse->isAuthentified()) {
+            $this->logger->error('Authentication failed: received invalid response with parameters: ' . print_r($_REQUEST, true));
+            $this->logger->error('Signature algorithm selected in module settings must be the same as one selected in gateway Back Office.');
 
-		$status = $order->order_data['orders_status_id'];
+            if ($this->from_server) {
+                $this->logger->info('IPN URL PROCESS END.');
+                $this->_die($this->payzenResponse->getOutputForGateway('auth_fail'));
+            } else {
+                $info->_addInfoSession(TEXT_PAYZEN_TECHNICAL_ERROR, 'error');
+                $this->logger->info('RETURN URL PROCESS END.');
+                $xtLink->_redirect($xtLink->_link(array('page' => 'index')));
+            }
+        }
 
-		if($status === LY_PAYZEN_ORDER_STATUS_NEW) {
-			// order not treated yet
+        // Load order data from DB.
+        $order = new order($this->orders_id, $this->customers_id);
+        if (! is_array($order->order_data)) {
+            $this->logger->error("Error: order #$this->orders_id not found in database.");
 
-			if ($payzenResponse->isAcceptedPayment()) {
-				$log_data['class'] = 'success';
-				$log_data['callback_data'] = serialize($payzenResponse->raw_response);
-				$this->_addLogEntry($log_data);
+            if ($this->from_server) {
+                $this->logger->info('IPN URL PROCESS END.');
+                $this->_die($this->payzenResponse->getOutputForGateway('order_not_found'));
+            } else {
+                $info->_addInfoSession(TEXT_PAYZEN_TECHNICAL_ERROR, 'error');
+                $this->logger->info('RETURN URL PROCESS END.');
+                $xtLink->_redirect($xtLink->_link(array('page' => 'index')));
+            }
+        }
 
-				$order->_sendOrderMail();
-				$this->_updateOrderStatus(LY_PAYZEN_SUCCESS_ORDER_STATUS, true, $payzenResponse->get('trans_id'), $payzenResponse->getLogString ());
-				$this->_savePayment($payzenResponse);
+        // Add prodfaq domain feautres to show going to production messages.
+        if (! $this->from_server && (LY_PAYZEN_CTX_MODE === 'TEST') && ly_payzen::$payzen_plugin_features['prodfaq']) {
+            $info->_addInfoSession(TEXT_PAYZEN_GOING_INTO_PROD_INFO, 'info');
+        }
 
-				$this->_cleanSession();
+        $status = $order->order_data['orders_status_id'];
+        if ($status === LY_PAYZEN_ORDER_STATUS_NEW) {
+            // Order not treated yet.
+            if ($this->payzenResponse->isAcceptedPayment()) {
+                $order->_sendOrderMail();
+                $this->_updateOrderStatus(LY_PAYZEN_SUCCESS_ORDER_STATUS, true, $this->payzenResponse->get('trans_id'), $this->payzenResponse->getLogMessage());
+                $this->_savePayment($this->payzenResponse);
 
-				if($this->from_server) {
-					die ($payzenResponse->getOutputForGateway('payment_ok'));
-				} else {
-					// order saved by client return, inform merchant in TEST mode
-					if(LY_PAYZEN_CTX_MODE === 'TEST') {
-						$info->_addInfoSession(TEXT_PAYZEN_CHECK_URL_WARN . '<br />' . TEXT_PAYZEN_CHECK_URL_WARN_DETAIL, 'warning');
-					}
+                $this->_cleanSession();
 
-					// redirect to success page
-					$xtLink->_redirect($xtLink->_link(array('page' => 'checkout', 'paction' => 'success')));
-				}
-			} else {
-				$log_data['class'] = $payzenResponse->isCancelledPayment() ? 'cancel' : 'failure';
-				$log_data['error_msg'] = $payzenResponse->getLogString();
-				$log_data['error_data'] = serialize($payzenResponse->raw_response);
-				$this->_addLogEntry($log_data);
+                if ($this->from_server) {
+                    $this->logger->info("Payment processed successfully by IPN URL call for order #$this->orders_id.");
+                    $this->logger->info('IPN URL PROCESS END.');
+                    $this->_die($this->payzenResponse->getOutputForGateway('payment_ok'));
+                } else {
+                    $this->logger->warn("Warning! IPN URL call has not worked. Payment completed by return URL call for order #$this->orders_id.");
+                    // Order saved by client return, inform merchant in TEST mode.
+                    if (LY_PAYZEN_CTX_MODE === 'TEST') {
+                        $info->_addInfoSession(TEXT_PAYZEN_CHECK_URL_WARN . '<br />' . TEXT_PAYZEN_CHECK_URL_WARN_DETAIL, 'warning');
+                    }
 
-				$this->_updateOrderStatus(LY_PAYZEN_FAILED_ORDER_STATUS, true, $payzenResponse->get('trans_id'), $payzenResponse->getLogString ());
-				if (!$payzenResponse->isCancelledPayment()) {
-					$this->_savePayment($payzenResponse); // save refused transaction details
-				}
+                    $this->logger->info('RETURN URL PROCESS END.');
 
-				if($this->from_server) {
-					die ($payzenResponse->getOutputForGateway('payment_ko'));
-				} else {
-					$info->_addInfoSession(TEXT_PAYZEN_PAYMENT_FAILURE, 'error');
+                    // Redirect to success page.
+                    $xtLink->_redirect($xtLink->_link(array('page' => 'checkout', 'paction' => 'success')));
+                }
+            } else {
+                $this->_updateOrderStatus(LY_PAYZEN_FAILED_ORDER_STATUS, true, $this->payzenResponse->get('trans_id'), $this->payzenResponse->getLogMessage());
 
-					// redirect to payment process
-					$xtLink->_redirect($xtLink->_link(array ('page' => 'checkout', 'paction' => 'payment')));
-				}
-			}
-		} else {
-			if ($payzenResponse->isAcceptedPayment() && $status === LY_PAYZEN_SUCCESS_ORDER_STATUS) {
-				if($this->from_server) {
-					die ($payzenResponse->getOutputForGateway('payment_ok_already_done'));
-				} else {
-					// redirect to success page
-					$xtLink->_redirect($xtLink->_link(array('page' => 'checkout', 'paction' => 'success')));
-				}
-			} elseif(!$payzenResponse->isAcceptedPayment() && $status == LY_PAYZEN_FAILED_ORDER_STATUS) {
-				if($this->from_server) {
-					die ($payzenResponse->getOutputForGateway('payment_ko_already_done'));
-				} else {
-					$info->_addInfoSession(TEXT_PAYZEN_PAYMENT_FAILURE, 'error');
+                if (! $this->payzenResponse->isCancelledPayment()) {
+                    $this->_savePayment($this->payzenResponse);
+                }
 
-					// redirect to payment process
-					$xtLink->_redirect($xtLink->_link(array('page' => 'checkout', 'paction' => 'payment')));
-				}
-			} else {
-				if($this->from_server) {
-					die ($payzenResponse->getOutputForGateway('payment_ok_on_order_ko'));
-				} else {
-					$info->_addInfoSession(TEXT_PAYZEN_PAYMENT_ERROR, 'error');
-					$xtLink->_redirect($xtLink->_link(array ('page' => 'index')));
-				}
-			}
-		}
-	}
+                if ($this->from_server) {
+                    $this->logger->info("Payment failed or cancelled for order #$this->orders_id. {$this->payzenResponse->getLogMessage()}");
+                    $this->logger->info('IPN URL PROCESS END.');
+                    $this->_die($this->payzenResponse->getOutputForGateway('payment_ko'));
+                } else {
+                    $this->logger->info("Payment failed or cancelled for order #$this->orders_id. {$this->payzenResponse->getLogMessage()}");
+                    $info->_addInfoSession(TEXT_PAYZEN_PAYMENT_ERROR, 'error');
+                    $this->logger->info('RETURN URL PROCESS END.');
 
-	function _savePayment($payzenResponse) {
-		global $db;
+                    // Redirect to payment process.
+                    $xtLink->_redirect($xtLink->_link(array('page' => 'checkout', 'paction' => 'payment')));
+                }
+            }
+        } else {
+            $this->logger->info("Order #$this->orders_id is already saved.");
+            if ($this->payzenResponse->isAcceptedPayment() && ($status === LY_PAYZEN_SUCCESS_ORDER_STATUS)) {
+                $this->logger->info("Payment successful confirmed for order #$this->orders_id.");
 
-		$currency = $payzenResponse->api->findCurrencyByNumCode($payzenResponse->get('currency'));
+                if ($this->from_server) {
+                    $this->logger->info('IPN URL PROCESS END.');
+                    $this->_die($this->payzenResponse->getOutputForGateway('payment_ok_already_done'));
+                } else {
+                    // Redirect to success page.
+                    $this->logger->info('RETURN URL PROCESS END.');
+                    $xtLink->_redirect($xtLink->_link(array('page' => 'checkout', 'paction' => 'success')));
+                }
+            } elseif (! $this->payzenResponse->isAcceptedPayment() && ($status === LY_PAYZEN_FAILED_ORDER_STATUS)) {
+                $this->logger->error("Error! Invalid payment result received for already saved order #$this->orders_id  Payment result : {$this->payzenResponse->getTransStatus()}, Order status : {$status}.");
 
-		$expiry = '';
-		if ($payzenResponse->get('expiry_month') && $payzenResponse->get('expiry_year')) {
-			$expiry = str_pad ($payzenResponse->get ('expiry_month'), 2, '0', STR_PAD_LEFT) . ' / ' . $payzenResponse->get('expiry_year');
-		}
+                if ($this->from_server) {
+                    $this->logger->info('IPN URL PROCESS END.');
+                    $this->_die($this->payzenResponse->getOutputForGateway('payment_ko_already_done'));
+                } else {
+                    $info->_addInfoSession(TEXT_PAYZEN_PAYMENT_ERROR, 'error');
+                    $this->logger->info('RETURN URL PROCESS END.');
 
-		$paymentInfo = array(
-				'PAYZEN_MESSAGE' => $payzenResponse->getLogString(),
-				'PAYZEN_TRANSACTION_TYPE' => $payzenResponse->get('operation_type'),
-				'PAYZEN_AMOUNT' => $currency->convertAmountToFloat($payzenResponse->get('amount')) . ' ' . $currency->alpha3,
-				'PAYZEN_TRANSACTION_ID' => $payzenResponse->get('trans_id'),
-				'PAYZEN_TRANSACTION_STATUS' => $payzenResponse->get('trans_status'),
-				'PAYZEN_PAYMENT_MEAN' => $payzenResponse->get('card_brand'),
-				'PAYZEN_CARD_NUMBER' => $payzenResponse->get('card_number'),
-				'PAYZEN_EXPIRATION_DATE' => $expiry
-		);
+                    // Redirect to payment process.
+                    $xtLink->_redirect($xtLink->_link(array('page' => 'checkout', 'paction' => 'payment')));
+                }
+            } else {
+                $this->logger->info("Payment failed or cancelled confirmed for order #$this->orders_id.");
 
-		if($payzenResponse->get('order_info2') != '') {
-			$paymentInfo['PAYZEN_MULTI_OPTION'] = $payzenResponse->get('order_info2');
-		}
+                if ($this->from_server) {
+                    $this->logger->info('IPN URL PROCESS END.');
+                    $this->_die($this->payzenResponse->getOutputForGateway('payment_ok_on_order_ko'));
+                } else {
+                    $info->_addInfoSession(TEXT_PAYZEN_TECHNICAL_ERROR, 'error');
+                    $this->logger->info('RETURN URL PROCESS END.');
+                    $xtLink->_redirect($xtLink->_link(array('page' => 'index')));
+                }
+            }
+        }
+    }
 
-		$db->AutoExecute(TABLE_ORDERS, array ('orders_data' => serialize($paymentInfo)), 'UPDATE', 'orders_id=' . $this->orders_id);
-	}
+    function _savePayment($payzenResponse)
+    {
+        global $db;
 
-	function _cleanSession() {
-		$_SESSION['success_order_id'] = $_SESSION ['last_order_id'];
+        $currency = PayzenApi::findCurrencyByNumCode($payzenResponse->get('currency'));
 
-		unset($_SESSION['last_order_id']);
-		unset($_SESSION['selected_shipping']);
-		unset($_SESSION['selected_payment']);
-		unset($_SESSION['conditions_accepted']);
+        $expiry = '';
+        if ($payzenResponse->get('expiry_month') && $payzenResponse->get('expiry_year')) {
+            $expiry = str_pad ($payzenResponse->get ('expiry_month'), 2, '0', STR_PAD_LEFT) . ' / ' . $payzenResponse->get('expiry_year');
+        }
 
-		$_SESSION['cart']->_resetCart();
-	}
+        $amount = $payzenResponse->get('amount');
+        $floatAmount = round($currency->convertAmountToFloat($amount), $currency->getDecimals());
+        $amountDetail = $floatAmount . ' ' . $currency->getAlpha3();
+
+        // Save effective amount in the currency selected by the client.
+        if ($payzenResponse->get('effective_currency') &&
+            $payzenResponse->get('currency') !== $payzenResponse->get('effective_currency')) {
+            $effectiveCurrency = PayzenApi::findCurrencyByNumCode($payzenResponse->get('effective_currency'));
+
+            // Get effective amount.
+            if ((substr($payzenResponse->get('payment_config'), 0, 5) === 'MULTI') && ($rate = $payzenResponse->get('change_rate'))) {
+                $effectiveAmount = (int) ($amount / $rate);
+            } else {
+                $effectiveAmount = $payzenResponse->get('effective_amount');
+            }
+
+            $floatEffectiveAmount = round($currency->convertAmountToFloat($effectiveAmount), $effectiveCurrency->getDecimals());
+            $amountDetail = $amountDetail . ' (' . $floatEffectiveAmount . ' ' . $effectiveCurrency->getAlpha3() . ')';
+        }
+
+        $paymentInfo = array(
+            'PAYZEN_MESSAGE' => $payzenResponse->getLogMessage(),
+            'PAYZEN_TRANSACTION_TYPE' => $payzenResponse->get('operation_type'),
+            'PAYZEN_AMOUNT' => $amountDetail,
+            'PAYZEN_TRANSACTION_ID' => $payzenResponse->get('trans_id'),
+            'PAYZEN_TRANSACTION_STATUS' => $payzenResponse->get('trans_status'),
+            'PAYZEN_PAYMENT_MEAN' => $payzenResponse->get('card_brand'),
+            'PAYZEN_CARD_NUMBER' => $payzenResponse->get('card_number'),
+            'PAYZEN_EXPIRATION_DATE' => $expiry
+        );
+
+        if ($this->multi_option) {
+            $paymentInfo['PAYZEN_MULTI_OPTION'] = $this->multi_option;
+        }
+
+        $db->AutoExecute(TABLE_ORDERS, array('orders_data' => serialize($paymentInfo)), 'UPDATE', 'orders_id=' . $this->orders_id);
+    }
+
+    function _cleanSession()
+    {
+        $_SESSION['success_order_id'] = $_SESSION['last_order_id'];
+
+        unset($_SESSION['last_order_id']);
+        unset($_SESSION['selected_shipping']);
+        unset($_SESSION['selected_payment']);
+        unset($_SESSION['conditions_accepted']);
+
+        $_SESSION['cart']->_resetCart();
+    }
+
+    function _die($message)
+    {
+        die($message);
+    }
 }
